@@ -1,0 +1,6 @@
+/DerivedData/
+/Pods/
+*.lock
+.DS_Store
+GSGCells.xcodeproj/xcuserdata
+GSGCells.xcodeproj/project.xcworkspace
