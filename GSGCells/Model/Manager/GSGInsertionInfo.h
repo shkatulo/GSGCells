@@ -16,9 +16,12 @@
 - (id)initWithInsertingCell:(GSGCell *)insertingCell cellA:(GSGCell *)cellA cellB:(GSGCell *)cellB;
 
 
-
 @property (nonatomic) GSGCell *insertingCell;
 @property (nonatomic) GSGCell *cellA;
 @property (nonatomic) GSGCell *cellB;
+
+// Optional connections. Are set if insertion was built from 2 connections
+@property (nonatomic) GSGConnectionInfo *connectionA;
+@property (nonatomic) GSGConnectionInfo *connectionB;
 
 @end

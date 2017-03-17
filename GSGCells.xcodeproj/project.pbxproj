@@ -21,26 +21,8 @@
 		71F4FEBE1E76A5C700F416F6 /* GSGCellsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 71F4FEB91E76A5C700F416F6 /* GSGCellsManager.m */; };
 		71F4FEBF1E76A5C700F416F6 /* GSGConnectionInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 71F4FEBB1E76A5C700F416F6 /* GSGConnectionInfo.m */; };
 		71F4FEC01E76A5C700F416F6 /* GSGInsertionInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 71F4FEBD1E76A5C700F416F6 /* GSGInsertionInfo.m */; };
-		71F4FF2C1E76B78C00F416F6 /* ClippingBezier.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71F4FF291E76B77B00F416F6 /* ClippingBezier.framework */; };
-		71F4FF2F1E76B78F00F416F6 /* PerformanceBezier.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71F4FF2E1E76B78F00F416F6 /* PerformanceBezier.framework */; };
+		71F4FF3E1E7AE3E800F416F6 /* UIBezierPath+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 71F4FF3D1E7AE3E800F416F6 /* UIBezierPath+Helpers.m */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		71F4FF281E76B77B00F416F6 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 71F4FF231E76B77B00F416F6 /* ClippingBezier.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 66AFACE71A8DDCA200FD0263;
-			remoteInfo = ClippingBezier;
-		};
-		71F4FF2A1E76B78500F416F6 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 71F4FF231E76B77B00F416F6 /* ClippingBezier.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 66AFACE61A8DDCA200FD0263;
-			remoteInfo = ClippingBezier;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		71E995AD1E72BB80009FCA8F /* GSGCells.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GSGCells.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -69,8 +51,9 @@
 		71F4FEBB1E76A5C700F416F6 /* GSGConnectionInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GSGConnectionInfo.m; sourceTree = "<group>"; };
 		71F4FEBC1E76A5C700F416F6 /* GSGInsertionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GSGInsertionInfo.h; sourceTree = "<group>"; };
 		71F4FEBD1E76A5C700F416F6 /* GSGInsertionInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GSGInsertionInfo.m; sourceTree = "<group>"; };
-		71F4FF231E76B77B00F416F6 /* ClippingBezier.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ClippingBezier.xcodeproj; path = GSGCells/ThirdParty/ClippingBezier/ClippingBezier.xcodeproj; sourceTree = "<group>"; };
 		71F4FF2E1E76B78F00F416F6 /* PerformanceBezier.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PerformanceBezier.framework; path = "GSGCells/ThirdParty/ClippingBezier/PerformanceBezier/build/Debug-iphoneos/PerformanceBezier.framework"; sourceTree = "<group>"; };
+		71F4FF3C1E7AE3E800F416F6 /* UIBezierPath+Helpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIBezierPath+Helpers.h"; sourceTree = "<group>"; };
+		71F4FF3D1E7AE3E800F416F6 /* UIBezierPath+Helpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIBezierPath+Helpers.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,8 +61,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				71F4FF2F1E76B78F00F416F6 /* PerformanceBezier.framework in Frameworks */,
-				71F4FF2C1E76B78C00F416F6 /* ClippingBezier.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -89,7 +70,6 @@
 		71E995A41E72BB80009FCA8F = {
 			isa = PBXGroup;
 			children = (
-				71F4FF231E76B77B00F416F6 /* ClippingBezier.xcodeproj */,
 				71E995AF1E72BB80009FCA8F /* GSGCells */,
 				71E995AE1E72BB80009FCA8F /* Products */,
 				71F4FF2D1E76B78F00F416F6 /* Frameworks */,
@@ -159,6 +139,8 @@
 			children = (
 				71E995DB1E72F941009FCA8F /* GeometryHelpers.h */,
 				71E995D91E72F934009FCA8F /* GeometryHelpers.m */,
+				71F4FF3C1E7AE3E800F416F6 /* UIBezierPath+Helpers.h */,
+				71F4FF3D1E7AE3E800F416F6 /* UIBezierPath+Helpers.m */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -174,14 +156,6 @@
 				71F4FEBD1E76A5C700F416F6 /* GSGInsertionInfo.m */,
 			);
 			path = Manager;
-			sourceTree = "<group>";
-		};
-		71F4FF241E76B77B00F416F6 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				71F4FF291E76B77B00F416F6 /* ClippingBezier.framework */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		71F4FF2D1E76B78F00F416F6 /* Frameworks */ = {
@@ -206,7 +180,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				71F4FF2B1E76B78500F416F6 /* PBXTargetDependency */,
 			);
 			name = GSGCells;
 			productName = GSGCells;
@@ -240,28 +213,12 @@
 			mainGroup = 71E995A41E72BB80009FCA8F;
 			productRefGroup = 71E995AE1E72BB80009FCA8F /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 71F4FF241E76B77B00F416F6 /* Products */;
-					ProjectRef = 71F4FF231E76B77B00F416F6 /* ClippingBezier.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				71E995AC1E72BB80009FCA8F /* GSGCells */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		71F4FF291E76B77B00F416F6 /* ClippingBezier.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework.static;
-			path = ClippingBezier.framework;
-			remoteRef = 71F4FF281E76B77B00F416F6 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		71E995AB1E72BB80009FCA8F /* Resources */ = {
@@ -292,18 +249,11 @@
 				71E995D11E72EBDA009FCA8F /* GSGCellView.m in Sources */,
 				71E995B21E72BB80009FCA8F /* main.m in Sources */,
 				71F4FEBF1E76A5C700F416F6 /* GSGConnectionInfo.m in Sources */,
+				71F4FF3E1E7AE3E800F416F6 /* UIBezierPath+Helpers.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		71F4FF2B1E76B78500F416F6 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = ClippingBezier;
-			targetProxy = 71F4FF2A1E76B78500F416F6 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		71E995B91E72BB80009FCA8F /* Main.storyboard */ = {

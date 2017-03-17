@@ -22,6 +22,11 @@ const NSUInteger kCellConnectPointLeftBottom = 7;
 const NSUInteger kCellConnectPointRightTop = 3;
 const NSUInteger kCellConnectPointRightBottom = 4;
 
+const NSUInteger kCellConnectPointLeftTopNeighbour = 1;
+const NSUInteger kCellConnectPointLeftBottomNeighbour = 6;
+const NSUInteger kCellConnectPointRightTopNeighbour = 2;
+const NSUInteger kCellConnectPointRightBottomNeighbour = 5;
+
 
 
 @implementation GSGCell {
@@ -188,7 +193,17 @@ const NSUInteger kCellConnectPointRightBottom = 4;
 
 
 - (CGPoint)centerPoint {
-    return CGPointMake(CGRectGetMidX(_boundingBox), CGRectGetMidY(_boundingBox));
+    CGPoint center = CGPointAdd(_points[kCellConnectPointLeftTopNeighbour].position, _points[kCellConnectPointLeftBottomNeighbour].position);
+    center = CGPointAdd(center, _points[kCellConnectPointRightTopNeighbour].position);
+    center = CGPointAdd(center, _points[kCellConnectPointRightBottomNeighbour].position);
+    center = CGPointScale(center, 0.25f);
+    return center;
+}
+
+
+
+- (CGPoint)boundingBoxCenter {
+    return CGPointMake(CGRectGetMidX(self.boundingBox), CGRectGetMidY(self.boundingBox));
 }
 
 
@@ -226,36 +241,47 @@ const NSUInteger kCellConnectPointRightBottom = 4;
 
 
 + (NSInteger)indexOfNotConnectableNeighbour:(NSInteger)connectablePointIndex {
-    if (connectablePointIndex == kCellConnectPointLeftTop) return connectablePointIndex + 1;
-    else if (connectablePointIndex == kCellConnectPointRightTop) return connectablePointIndex - 1;
-    else if (connectablePointIndex == kCellConnectPointLeftBottom) return connectablePointIndex - 1;
-    else if (connectablePointIndex == kCellConnectPointRightBottom) return connectablePointIndex + 1;
+    if (connectablePointIndex == kCellConnectPointLeftTop) return kCellConnectPointLeftTopNeighbour;
+    else if (connectablePointIndex == kCellConnectPointRightTop) return kCellConnectPointRightTopNeighbour;
+    else if (connectablePointIndex == kCellConnectPointLeftBottom) return kCellConnectPointLeftBottomNeighbour;
+    else if (connectablePointIndex == kCellConnectPointRightBottom) return kCellConnectPointRightBottomNeighbour;
     
     return NSNotFound;
 }
 
 
 
-- (CGPoint)relativeToNeighboursPointPosition:(NSInteger)pointIndex {
-    NSInteger prevNeighbourIndex = (pointIndex > 0) ? (pointIndex - 1) : (_points.count - 1);
-    NSInteger nextNeighbourIndex = (pointIndex + 1) % _points.count;
++ (NSInteger)indexOfConnectablePointToPoint:(NSInteger)pointIndex {
+    if (pointIndex == kCellConnectPointLeftTop ||
+        pointIndex == kCellConnectPointRightTop ||
+        pointIndex == kCellConnectPointLeftBottom ||
+        pointIndex == kCellConnectPointRightBottom) {
+        return [GSGCell indexOfOppositeSidePoint:pointIndex];
+    }
     
-    CGPoint full = CGPointSubtract(_points[nextNeighbourIndex].position, _points[prevNeighbourIndex].position);
-    CGPoint part = CGPointSubtract(_points[pointIndex].position, _points[prevNeighbourIndex].position);
-    
-    return CGPointDivide(part, full);
+    return NSNotFound;
 }
 
 
 
-- (void)setPointPosition:(NSInteger)pointIndex relativeToNeighbours:(CGPoint)position {
-    NSInteger prevNeighbourIndex = (pointIndex > 0) ? (pointIndex - 1) : (_points.count - 1);
-    NSInteger nextNeighbourIndex = (pointIndex + 1) % _points.count;
++ (NSInteger)indexOfOppositeSidePoint:(NSInteger)pointIndex {
+    if (pointIndex == kCellConnectPointLeftTop) return kCellConnectPointRightTop;
+    else if (pointIndex == kCellConnectPointRightTop) return kCellConnectPointLeftTop;
+    else if (pointIndex == kCellConnectPointLeftBottom) return kCellConnectPointRightBottom;
+    else if (pointIndex == kCellConnectPointRightBottom) return kCellConnectPointLeftBottom;
     
-    CGPoint full = CGPointSubtract(_points[nextNeighbourIndex].position, _points[prevNeighbourIndex].position);
-    CGPoint part = CGPointMultiply(position, full);
+    if (pointIndex == kCellConnectPointLeftTopNeighbour) return kCellConnectPointRightTopNeighbour;
+    else if (pointIndex == kCellConnectPointRightTopNeighbour) return kCellConnectPointLeftTopNeighbour;
+    else if (pointIndex == kCellConnectPointLeftBottomNeighbour) return kCellConnectPointRightBottomNeighbour;
+    else if (pointIndex == kCellConnectPointRightBottomNeighbour) return kCellConnectPointLeftBottomNeighbour;
     
-    _points[pointIndex].position = CGPointAdd(_points[prevNeighbourIndex].position, part);
+    return NSNotFound;
+}
+
+
+
++ (BOOL)isTopConnectablePoint:(NSInteger)pointIndex {
+    return (pointIndex == kCellConnectPointLeftTop || pointIndex == kCellConnectPointRightTop);
 }
 
 
@@ -283,6 +309,27 @@ const NSUInteger kCellConnectPointRightBottom = 4;
     // Check paths
     BOOL pathIntersects = UIBezierPathGetFirstIntersection(self.bezierPath, cell.bezierPath, 4, NULL);
     return pathIntersects;
+}
+
+
+
+- (BOOL)isConnectedToCell:(GSGCell *)cell {
+    for (int i = 0; i < _points.count; ++i) {
+        GSGPoint *point = _points[i];
+        if (point.connectedCell == cell) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+
+
+- (void)moveBy:(CGPoint)moveVector {
+    for (int i = 0; i < _points.count; ++i) {
+        GSGPoint *point = _points[i];
+        point.position = CGPointAdd(point.position, moveVector);
+    }
 }
 
 @end

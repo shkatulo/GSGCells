@@ -10,8 +10,6 @@
 #import "GSGCellView.h"
 #import "GSGCellsManager.h"
 #import "GeometryHelpers.h"
-#import <ClippingBezier/ClippingBezier.h>
-#import <PerformanceBezier/PerformanceBezier.h>
 
 
 
@@ -33,6 +31,8 @@
     GSGCellsManager *_cellsManager;
     NSMutableArray<GSGCellView *> *_cellViews;
     
+    NSMutableArray<GSGCellView *> *_operationAffectedViews;
+    
     int _shapeIndex;
 }
 
@@ -43,6 +43,7 @@
     
     _cellViews = [NSMutableArray array];
     _cellsManager = [[GSGCellsManager alloc] init];
+    _operationAffectedViews = [NSMutableArray array];
     
     [self addNewCell];
     
@@ -53,9 +54,12 @@
 
 
 - (IBAction)actionChangeShape:(id)sender {
+    GSGCellView *cellView = [self latestCellView];
+    if ([cellView.cell hasConnections])
+        return;
+    
     _shapeIndex = (_shapeIndex + 1) % SHAPES_COUNT;
     
-    GSGCellView *cellView = [self latestCellView];
     [cellView beginShapeChangeWithDuration:self.swtAnimated.on ? 0.5 : 0.0];
     [cellView.cell initialiseShape:_shapeIndex aroundPoint:cellView.cell.centerPoint];
     [cellView endShapeChange];
@@ -66,35 +70,11 @@
 
 
 - (IBAction)actionConnect:(id)sender {
-    NSArray<GSGConnectionInfo *> *connections = [_cellsManager getAvailableConnections];
-    NSMutableArray<GSGCellView *> *affectedViews = [NSMutableArray array];
- 
-    // Apply available connections
-    for (GSGConnectionInfo *connection in connections) {
-        // Get presentation views for connected cells
-        GSGCellView *cellViewFrom = [self cellViewForCell:connection.cellFrom];
-        GSGCellView *cellViewTo = [self cellViewForCell:connection.cellTo];
-        
-        // Begin animated shape change of both connected cells
-        if (![affectedViews containsObject:cellViewFrom]) {
-            [affectedViews addObject:cellViewFrom];
-            [cellViewFrom beginShapeChangeWithDuration:self.swtAnimated.on ? 0.5 : 0.0];
-        }
-        
-        if (![affectedViews containsObject:cellViewTo]) {
-            [affectedViews addObject:cellViewTo];
-            [cellViewTo beginShapeChangeWithDuration:self.swtAnimated.on ? 0.5 : 0.0];
-        }
-        
-        // Do connection logic
-        [_cellsManager connectCells:connection];
-    }
+    NSMutableArray<GSGConnectionInfo *> *connections = [[_cellsManager getAvailableConnections] mutableCopy];
     
-    // End animation for affected cell views
-    for (GSGCellView *cellView in affectedViews) {
-        [cellView endShapeChange];
-        cellView.isDraggable = NO;
-    }
+    [self beginCellsOperations];
+    [self applyConnections:connections];
+    [self endCellsOperations];
     
     [self updateConnectButtonVisibility];
 }
@@ -151,19 +131,76 @@
 
 
 
+- (void)beginCellsOperations {
+    [_operationAffectedViews removeAllObjects];
+}
+
+
+
+- (void)addOperationAffectedCell:(GSGCell *)cell {
+    GSGCellView *cellView = [self cellViewForCell:cell];
+    
+    if (![_operationAffectedViews containsObject:cellView]) {
+        [_operationAffectedViews addObject:cellView];
+        [cellView beginShapeChangeWithDuration:self.swtAnimated.on ? 0.5 : 0.0];
+    }
+}
+
+
+
+- (void)endCellsOperations {
+    // End animation for affected cell views
+    for (GSGCellView *cellView in _operationAffectedViews) {
+        [cellView endShapeChange];
+        cellView.isDraggable = NO;
+    }
+    
+    [_operationAffectedViews removeAllObjects];
+}
+
+
+
+- (void)applyConnections:(NSArray<GSGConnectionInfo *> *)connections {
+    // Apply available connections
+    for (GSGConnectionInfo *connection in connections) {
+        [self addOperationAffectedCell:connection.cellFrom];
+        [self addOperationAffectedCell:connection.cellTo];
+        
+        // Do connection logic
+        [_cellsManager connectCells:connection];
+    }
+}
+
+
+
+- (void)applyInsertions:(NSArray<GSGInsertionInfo *> *)insertions {
+    // Apply available insertions
+    for (GSGInsertionInfo *insertion in insertions) {
+        [self addOperationAffectedCell:insertion.insertingCell];
+        [self addOperationAffectedCell:insertion.cellA];
+        [self addOperationAffectedCell:insertion.cellB];
+        
+        // Do insertion logic
+        [_cellsManager insertCell:insertion];
+    }
+}
+
+
+
 #pragma mark -
 #pragma mark Cell view delegate
 - (void)cellViewDidFinishDragging:(GSGCellView *)cellView {
-    [self updateConnectButtonVisibility];
+    // Check insertions
+    NSArray<GSGInsertionInfo *> *insertions = [_cellsManager getAvailableInsertions];
+//    NSLog(@"Available insertions: %lu", (unsigned long)insertions.count);
     
-    // Testing cells intersection
-    if (_cellViews.count == 2) {
-        GSGCellView *cellView1 = _cellViews[0];
-        GSGCellView *cellView2 = _cellViews[1];
-        
-        BOOL intersects = [cellView1.cell intersectsWithCell:cellView2.cell];
-        NSLog(@"Cells intersection: %@", intersects ? @"YES" : @"NO");
-    }
+    [self beginCellsOperations];
+    [self applyInsertions:insertions];
+    [self endCellsOperations];
+    
+    
+    // Check connections
+    [self updateConnectButtonVisibility];
 }
 
 

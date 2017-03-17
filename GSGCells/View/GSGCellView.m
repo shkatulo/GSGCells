@@ -30,7 +30,7 @@
     BOOL _isTouched;
     BOOL _isDragging;
     CGPoint _dragOffset;
-    CGPoint _positionBeforeDrag;
+    CGPoint _originBeforeDrag;
 }
 
 
@@ -39,7 +39,7 @@
     self = [super init];
     if (self) {
         _isDraggable = YES;
-        _dragThreshold = 5.0f;
+        _dragThreshold = 3.0f;
         
         self.backgroundColor = [[UIColor blueColor] colorWithAlphaComponent:0.05f];
         
@@ -146,7 +146,7 @@
         else CGContextSetFillColorWithColor(context, [UIColor redColor].CGColor);
         
         // Draw point circles
-        CGPoint pos = [point positionRelativeToPoint:self.frame.origin];
+        CGPoint pos = [point positionRelativeToPoint:_cell.boundingBox.origin];
         [self drawCircleAtPoint:pos withRadius:4.0f inContext:context];
         
         // Draw point numbers
@@ -206,6 +206,13 @@
 - (void)setDebugLayerIsHidden:(BOOL)debugLayerIsHidden {
     _debugLayerIsHidden = debugLayerIsHidden;
     _debugLayer.hidden = _debugLayerIsHidden;
+}
+
+
+
+- (void)setNeedsDisplay {
+    [super setNeedsDisplay];
+    [_debugLayer setNeedsDisplay];
 }
 
 
@@ -298,7 +305,7 @@
     UITouch *touch = [touches anyObject];
     _dragOffset = [touch locationInView:self];
     
-    _positionBeforeDrag = self.frame.origin;
+    _originBeforeDrag = self.frame.origin;
     _isTouched = YES;
     _isDragging = NO;
 }
@@ -315,16 +322,10 @@
     CGPoint newOrigin = CGPointMake(location.x - _dragOffset.x, location.y - _dragOffset.y);
     
     if (_isDragging) {
-        self.frame = CGRectMake(location.x - _dragOffset.x, location.y - _dragOffset.y,
-                                self.frame.size.width, self.frame.size.height);
-        
-        // Move callback
-        if ([self.delegate respondsToSelector:@selector(cellViewDidDrag:)]) {
-            [self.delegate cellViewDidDrag:self];
-        }
+        [self dragWithNewOrigin:newOrigin];
     }
     else {
-        float dragDistance = CGPointGetDistance(_positionBeforeDrag, newOrigin);
+        float dragDistance = CGPointGetDistance(_originBeforeDrag, newOrigin);
         
         if (dragDistance > _dragThreshold) {
             if (_isDraggable) {
@@ -334,6 +335,9 @@
                 if ([self.delegate respondsToSelector:@selector(cellViewDidStartDragging:)]) {
                     [self.delegate cellViewDidStartDragging:self];
                 }
+                
+                // Handle first move
+                [self dragWithNewOrigin:newOrigin];
             }
             else {
                 _isTouched = NO;
@@ -350,13 +354,8 @@
     
     if (_isDragging) {
         // Update model
-        CGPoint dragVector = CGPointSubtract(self.frame.origin, _positionBeforeDrag);
-        
-        for (int i = 0; i < _cell.points.count; ++i) {
-            GSGPoint *point = _cell.points[i];
-            point.position = CGPointAdd(point.position, dragVector);
-        }
-        
+        CGPoint dragVector = CGPointSubtract(self.frame.origin, _originBeforeDrag);
+        [_cell moveBy:dragVector];
         [_cell updateBezierControlVectors];
         
         // End dragging callback
@@ -379,6 +378,17 @@
 
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [self touchesEnded:touches withEvent:event];
+}
+
+
+
+- (void)dragWithNewOrigin:(CGPoint)newOrigin {
+    self.frame = CGRectMake(newOrigin.x, newOrigin.y, self.frame.size.width, self.frame.size.height);
+    
+    // Move callback
+    if ([self.delegate respondsToSelector:@selector(cellViewDidDrag:)]) {
+        [self.delegate cellViewDidDrag:self];
+    }
 }
 
 @end

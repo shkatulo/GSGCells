@@ -16,12 +16,18 @@ extern const NSUInteger kCellConnectPointLeftBottom;
 extern const NSUInteger kCellConnectPointRightTop;
 extern const NSUInteger kCellConnectPointRightBottom;
 
+extern const NSUInteger kCellConnectPointLeftTopNeighbour;
+extern const NSUInteger kCellConnectPointLeftBottomNeighbour;
+extern const NSUInteger kCellConnectPointRightTopNeighbour;
+extern const NSUInteger kCellConnectPointRightBottomNeighbour;
+
 
 
 @interface GSGCell : NSObject
 
 @property (nonatomic, readonly) CGRect boundingBox;
 @property (nonatomic, readonly) CGPoint centerPoint;
+@property (nonatomic, readonly) CGPoint boundingBoxCenter;
 
 @property (nonatomic, readonly) NSArray<GSGPoint *> *points;
 
@@ -48,11 +54,15 @@ extern const NSUInteger kCellConnectPointRightBottom;
 - (BOOL)hasAvailableConnections;
 
 + (NSInteger)indexOfNotConnectableNeighbour:(NSInteger)connectablePointIndex;
-- (CGPoint)relativeToNeighboursPointPosition:(NSInteger)pointIndex;
-- (void)setPointPosition:(NSInteger)pointIndex relativeToNeighbours:(CGPoint)position;
++ (NSInteger)indexOfConnectablePointToPoint:(NSInteger)pointIndex;
++ (NSInteger)indexOfOppositeSidePoint:(NSInteger)pointIndex;
++ (BOOL)isTopConnectablePoint:(NSInteger)pointIndex;
 
 - (NSInteger)bezierSegmentIndexBetweenPoint1:(NSInteger)point1Index andPoint2:(NSInteger)point2Index;
 
 - (BOOL)intersectsWithCell:(GSGCell *)cell;
+- (BOOL)isConnectedToCell:(GSGCell *)cell;
+
+- (void)moveBy:(CGPoint)moveVector;
 
 @end

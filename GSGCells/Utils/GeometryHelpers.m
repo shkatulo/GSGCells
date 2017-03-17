@@ -7,7 +7,6 @@
 //
 
 #import "GeometryHelpers.h"
-#import <PerformanceBezier/PerformanceBezier.h>
 
 
 
@@ -58,6 +57,32 @@ float CGPointGetDistance(CGPoint point1, CGPoint point2) {
 CGPoint CGPointNormalize(CGPoint point) {
     float len = CGPointGetLength(point);
     return CGPointMake(point.x / len, point.y / len);
+}
+
+
+
+BOOL CGPointIsAboveLine(CGPoint point, CGPoint linePointA, CGPoint linePointB) {
+    if (linePointA.x == linePointB.x)
+        return NO; // vertical line
+    
+    float lineRatio = (linePointB.y - linePointA.y) / (linePointB.x - linePointA.x);
+    float lineOffset = linePointA.y - linePointA.x * lineRatio;
+    
+    float y = point.x * lineRatio + lineOffset;
+    return point.y > y;
+}
+
+
+
+BOOL CGPointIsOnTheRightSideOfLine(CGPoint point, CGPoint linePointA, CGPoint linePointB) {
+    if (linePointA.y == linePointB.y)
+        return NO; // horisontal line
+    
+    float lineRatio = (linePointB.x - linePointA.x) / (linePointB.y - linePointA.y);
+    float lineOffset = linePointA.x - linePointA.y * lineRatio;
+    
+    float x = point.y * lineRatio + lineOffset;
+    return point.x > x;
 }
 
 
@@ -160,6 +185,3 @@ BOOL GetLinesIntersectionPoint(CGPoint pointA1, CGPoint pointA2, CGPoint pointB1
     
     return YES;
 }
-
-
-

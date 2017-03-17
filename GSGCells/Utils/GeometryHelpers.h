@@ -10,6 +10,8 @@
 #define GeometryHelpers_h
 
 #import <UIKit/UIKit.h>
+#import "UIBezierPath+Helpers.h"
+
 
 
 CGPoint CGPointAdd(CGPoint point1, CGPoint point2);
@@ -21,6 +23,9 @@ CGPoint CGPointScale(CGPoint point, float scaleFactor);
 float CGPointGetLength(CGPoint point);
 float CGPointGetDistance(CGPoint point1, CGPoint point2);
 CGPoint CGPointNormalize(CGPoint point);
+
+BOOL CGPointIsAboveLine(CGPoint point, CGPoint linePointA, CGPoint linePointB);
+BOOL CGPointIsOnTheRightSideOfLine(CGPoint point, CGPoint linePointA, CGPoint linePointB);
 
 
 

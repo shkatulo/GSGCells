@@ -22,4 +22,14 @@
 @property (nonatomic) NSInteger fromBottomPointIndex;
 @property (nonatomic) NSInteger toBottomPointIndex;
 
+// Can be empty - used for finding shortest connection if multiple are available
+@property (nonatomic) float distanceTop;
+@property (nonatomic) float distanceBottom;
+
+
+- (GSGCell *)commonCellWithOtherConnection:(GSGConnectionInfo *)connection;
+- (void)invert;
+- (NSArray<GSGPoint *> *)affectedPoints;
+- (BOOL)isFromRightToLeft;
+
 @end

@@ -17,6 +17,7 @@
 
 @property (nonatomic) float connectionDistance;
 @property (nonatomic) float connectionDetectionDistance;
+@property (nonatomic) float minInsertionDistance;
 
 
 - (void)addCell:(GSGCell *)cell;
@@ -27,7 +28,6 @@
 
 - (void)connectCells:(GSGConnectionInfo *)connectionInfo;
 - (void)insertCell:(GSGInsertionInfo *)insertionInfo;
-- (void)updateCellConnections:(GSGCell *)cell;
 - (void)disconnectCell:(GSGCell *)cell;
 
 @end
