@@ -19,6 +19,7 @@ CGPoint CGPointSubtract(CGPoint point1, CGPoint point2);
 CGPoint CGPointMultiply(CGPoint point1, CGPoint point2);
 CGPoint CGPointDivide(CGPoint point1, CGPoint point2);
 CGPoint CGPointScale(CGPoint point, float scaleFactor);
+CGPoint CGPointGetMid(CGPoint point1, CGPoint point2);
 
 float CGPointGetLength(CGPoint point);
 float CGPointGetDistance(CGPoint point1, CGPoint point2);

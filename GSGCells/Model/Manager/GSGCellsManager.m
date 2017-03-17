@@ -237,7 +237,7 @@
         for (NSInteger pairIndex = 0; pairIndex < connectedPairsCount; ++pairIndex) {
             NSArray<GSGCell *> *pair =connectedCellPairs[pairIndex];
             
-            CGPoint midPoint = CGPointScale(CGPointAdd(pair[0].centerPoint, pair[1].centerPoint), 0.5f);
+            CGPoint midPoint = CGPointGetMid(pair[0].centerPoint, pair[1].centerPoint);
             float distance = CGPointGetDistance(insertingCell.centerPoint, midPoint);
             
             if (distance < nearestPairDistance) {
@@ -259,6 +259,94 @@
                                                                                     cellB:nearestPair[1]];
         [insertions addObject:insertionInfo];
     }
+    
+    return insertions;
+}
+
+
+
+- (NSArray<GSGInsertionInfo *> *)findInsertionsInConnectionsArray:(NSMutableArray<GSGConnectionInfo *> *)inOutConnections {
+    // Sometimes after moving cell it may have connections on both sides.
+    // In this case it's better to handle them as single insertion (instead of сonsistently connections).
+    // Connection pairs interpreted as insertions will be removed from array.
+    
+    NSMutableArray<GSGInsertionInfo *> *insertions = [NSMutableArray array];
+    
+    NSInteger connectionsCount = inOutConnections.count;
+    for (NSInteger connectionIndex1 = 0; connectionIndex1 < connectionsCount; ++connectionIndex1) {
+        GSGConnectionInfo *connectionInfo1 = inOutConnections[connectionIndex1];
+        
+        for (NSInteger connectionIndex2 = connectionIndex1 + 1; connectionIndex2 < connectionsCount; ++connectionIndex2) {
+            GSGConnectionInfo *connectionInfo2 = inOutConnections[connectionIndex2];
+            
+            // Have common cell
+            GSGCell *insertingCell = [connectionInfo1 commonCellWithOtherConnection:connectionInfo2];
+            if (insertingCell == nil)
+                continue;
+            
+            // Other 2 cells must be not the same cell
+            GSGCell *cellA = (connectionInfo1.cellFrom == insertingCell) ? connectionInfo1.cellTo : connectionInfo1.cellFrom;
+            GSGCell *cellB = (connectionInfo2.cellFrom == insertingCell) ? connectionInfo2.cellTo : connectionInfo2.cellFrom;
+            if (cellA == cellB)
+                continue;
+            
+            // Other 2 cells must have connections on 1 side
+            if (![cellA hasConnections] && ![cellB hasConnections])
+                continue;
+            
+            // Place inserting cell to fromCell in both connections
+            if (connectionInfo1.cellTo == insertingCell) {
+                [connectionInfo1 invert];
+            }
+            if (connectionInfo2.cellTo == insertingCell) {
+                [connectionInfo2 invert];
+            }
+            
+            // Check if connections are on different sides
+            if (connectionInfo1.fromTopPointIndex == connectionInfo2.fromTopPointIndex)
+                continue;
+            
+            // Create insertion info
+            GSGInsertionInfo *insertionInfo = [[GSGInsertionInfo alloc] initWithInsertingCell:insertingCell
+                                                                                        cellA:cellA
+                                                                                        cellB:cellB];
+            insertionInfo.connectionA = connectionInfo1;
+            insertionInfo.connectionB = connectionInfo2;
+            [insertions addObject:insertionInfo];
+            
+            // Remove connections from array
+            [inOutConnections removeObject:connectionInfo1];
+            [inOutConnections removeObject:connectionInfo2];
+            connectionsCount -= 2;
+            connectionIndex1 -= 1;
+            connectionIndex2 -= 2;
+        }
+    }
+    
+//    // Remove connections which affect same cells and points as new insertions
+//    NSMutableArray<GSGPoint *> *insertionAffectedPoints = [NSMutableArray array];
+//    for (GSGInsertionInfo *insertion in insertions) {
+//        [insertionAffectedPoints addObjectsFromArray:[insertion.connectionA affectedPoints]];
+//        [insertionAffectedPoints addObjectsFromArray:[insertion.connectionB affectedPoints]];
+//    }
+//    
+//    for (NSInteger i = 0; i < connectionsCount; ++i) {
+//        GSGConnectionInfo *connectionInfo = inOutConnections[i];
+//        
+//        BOOL needRemove = NO;
+//        for (GSGPoint *point in [connectionInfo affectedPoints]) {
+//            if ([insertionAffectedPoints containsObject:point]) {
+//                needRemove = YES;
+//                break;
+//            }
+//        }
+//        
+//        if (needRemove) {
+//            [inOutConnections removeObjectAtIndex:i];
+//            connectionsCount--;
+//            i--;
+//        }
+//    }
     
     return insertions;
 }
@@ -355,8 +443,8 @@
     
     // 4. Move neighbour points proportionally
     // Calculate distance to avg point between connection points of both cells after moving them on step 3
-    CGPoint fromConnectionMidPoint =     CGPointScale(CGPointAdd(fromTopPoint.position, fromBottomPoint.position), 0.5f);
-    CGPoint toConnectionMidPoint =       CGPointScale(CGPointAdd(toTopPoint.position, toBottomPoint.position), 0.5f);
+    CGPoint fromConnectionMidPoint =     CGPointGetMid(fromTopPoint.position, fromBottomPoint.position);
+    CGPoint toConnectionMidPoint =       CGPointGetMid(toTopPoint.position, toBottomPoint.position);
     float fromConnectionMidDistance =    CGPointGetDistance(cellFromCenter, fromConnectionMidPoint);
     float toConnectionMidDistance =      CGPointGetDistance(cellToCenter, toConnectionMidPoint);
     
@@ -377,11 +465,11 @@
     BOOL isFromBottomNeighbourOnTheRight =      CGPointIsOnTheRightSideOfLine(fromBottomPointNeighbour.position, fromBottomPointNeighbourOpposite.position, fromTopPointNeighbourOpposite.position);
     BOOL isFromConnectionMidPointOnTheRight =   CGPointIsOnTheRightSideOfLine(fromConnectionMidPoint, fromBottomPointNeighbourOpposite.position, fromTopPointNeighbourOpposite.position);
     if (isFromConnectionMidPointOnTheRight != isFromTopNeighbourOnTheRight) { // connection and neighbour are on different sides
-//        fromTopPointNeighbour.position = CGPointScale(CGPointAdd(fromTopPoint.position, fromTopPointNeighbourOpposite.position), 0.5f);
+//        fromTopPointNeighbour.position = CGPointGetMid(fromTopPoint.position, fromTopPointNeighbourOpposite.position);
         fromTopPointNeighbour.position = fromTopPointNeighbourOpposite.position;
     }
     if (isFromConnectionMidPointOnTheRight != isFromBottomNeighbourOnTheRight) { // connection and neighbour are on different sides
-//        fromBottomPointNeighbour.position = CGPointScale(CGPointAdd(fromBottomPoint.position, fromBottomPointNeighbourOpposite.position), 0.5f);
+//        fromBottomPointNeighbour.position = CGPointGetMid(fromBottomPoint.position, fromBottomPointNeighbourOpposite.position);
         fromBottomPointNeighbour.position = fromBottomPointNeighbourOpposite.position;
     }
     
@@ -389,11 +477,11 @@
     BOOL isToBottomNeighbourOnTheRight =      CGPointIsOnTheRightSideOfLine(toBottomPointNeighbour.position, toBottomPointNeighbourOpposite.position, toTopPointNeighbourOpposite.position);
     BOOL isToConnectionMidPointOnTheRight =   CGPointIsOnTheRightSideOfLine(toConnectionMidPoint, toBottomPointNeighbourOpposite.position, toTopPointNeighbourOpposite.position);
     if (isToConnectionMidPointOnTheRight != isToTopNeighbourOnTheRight) { // connection and neighbour are on different sides
-//        toTopPointNeighbour.position = CGPointScale(CGPointAdd(toTopPoint.position, toTopPointNeighbourOpposite.position), 0.5f);
+//        toTopPointNeighbour.position = CGPointGetMid(toTopPoint.position, toTopPointNeighbourOpposite.position);
         toTopPointNeighbour.position = toTopPointNeighbourOpposite.position;
     }
     if (isToConnectionMidPointOnTheRight != isToBottomNeighbourOnTheRight) { // connection and neighbour are on different sides
-//        toBottomPointNeighbour.position = CGPointScale(CGPointAdd(toBottomPoint.position, toBottomPointNeighbourOpposite.position), 0.5f);
+//        toBottomPointNeighbour.position = CGPointGetMid(toBottomPoint.position, toBottomPointNeighbourOpposite.position);
         toBottomPointNeighbour.position = toBottomPointNeighbourOpposite.position;
     }
     
@@ -450,7 +538,7 @@
 
 - (void)insertCell:(GSGInsertionInfo *)insertionInfo {
     // 1. Place inserting cell between cell A and cell B
-    CGPoint insertionMidPoint = CGPointScale(CGPointAdd(insertionInfo.cellA.centerPoint, insertionInfo.cellB.centerPoint), 0.5f);
+    CGPoint insertionMidPoint = CGPointGetMid(insertionInfo.cellA.centerPoint, insertionInfo.cellB.centerPoint);
     CGPoint moveVector = CGPointSubtract(insertionMidPoint, insertionInfo.insertingCell.centerPoint);
     [insertionInfo.insertingCell moveBy:moveVector];
     
@@ -519,7 +607,26 @@
 
 
 
-- (void)disconnectCell:(GSGCell *)cell {
+- (NSArray<GSGCell *> *)disconnectCell:(GSGCell *)cell {
+    NSMutableArray<GSGCell *> *affectedCells = [NSMutableArray array];
+    [affectedCells addObject:cell];
+    
+    for (NSInteger i = 0; i < cell.points.count; ++i) {
+        GSGPoint *point = cell.points[i];
+        GSGPoint *connectedPoint = point.connectedCell.points[point.connectedPointIndex];
+        
+        if (point.connectedCell && ![affectedCells containsObject:point.connectedCell]) {
+            [affectedCells addObject:point.connectedCell];
+        }
+        
+        point.connectedCell = nil;
+        point.connectedPointIndex = NSNotFound;
+        
+        connectedPoint.connectedCell = nil;
+        connectedPoint.connectedPointIndex = NSNotFound;
+    }
+    
+    return affectedCells;
 }
 
 @end

@@ -25,9 +25,10 @@
 
 - (NSArray<GSGConnectionInfo *> *)getAvailableConnections;
 - (NSArray<GSGInsertionInfo *> *)getAvailableInsertions;
+- (NSArray<GSGInsertionInfo *> *)findInsertionsInConnectionsArray:(NSMutableArray<GSGConnectionInfo *> *)connections;
 
 - (void)connectCells:(GSGConnectionInfo *)connectionInfo;
 - (void)insertCell:(GSGInsertionInfo *)insertionInfo;
-- (void)disconnectCell:(GSGCell *)cell;
+- (NSArray<GSGCell *> *)disconnectCell:(GSGCell *)cell;
 
 @end

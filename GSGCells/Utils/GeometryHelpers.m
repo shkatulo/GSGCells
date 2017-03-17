@@ -40,6 +40,12 @@ CGPoint CGPointScale(CGPoint point, float scaleFactor) {
 
 
 
+CGPoint CGPointGetMid(CGPoint point1, CGPoint point2) {
+    return CGPointMake((point1.x + point2.x) * 0.5f, (point1.y + point2.y) * 0.5f);
+}
+
+
+
 float CGPointGetLength(CGPoint point) {
     return sqrtf(point.x * point.x + point.y * point.y);
 }

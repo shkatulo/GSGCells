@@ -71,8 +71,10 @@
 
 - (IBAction)actionConnect:(id)sender {
     NSMutableArray<GSGConnectionInfo *> *connections = [[_cellsManager getAvailableConnections] mutableCopy];
+    NSArray<GSGInsertionInfo *> *insertions = [_cellsManager findInsertionsInConnectionsArray:connections]; // See comment in method body
     
     [self beginCellsOperations];
+    [self applyInsertions:insertions];
     [self applyConnections:connections];
     [self endCellsOperations];
     
@@ -152,7 +154,6 @@
     // End animation for affected cell views
     for (GSGCellView *cellView in _operationAffectedViews) {
         [cellView endShapeChange];
-        cellView.isDraggable = NO;
     }
     
     [_operationAffectedViews removeAllObjects];
@@ -189,6 +190,19 @@
 
 #pragma mark -
 #pragma mark Cell view delegate
+- (void)cellViewDidStartDragging:(GSGCellView *)cellView {
+    if ([cellView.cell hasConnections]) {
+        NSArray<GSGCell *> *affectedCells = [_cellsManager disconnectCell:cellView.cell];
+        
+        for (GSGCell *cell in affectedCells) {
+            GSGCellView *cellView = [self cellViewForCell:cell];
+            [cellView setNeedsDisplay];
+        }
+    }
+}
+
+
+
 - (void)cellViewDidFinishDragging:(GSGCellView *)cellView {
     // Check insertions
     NSArray<GSGInsertionInfo *> *insertions = [_cellsManager getAvailableInsertions];
