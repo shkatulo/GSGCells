@@ -45,8 +45,8 @@ extern const NSUInteger kCellConnectPointRightBottomNeighbour;
 
 - (void)updateBezierControlVectors;
 - (UIBezierPath *)bezierPath;
-- (UIBezierPath *)bezierPathRelativeToPoint:(CGPoint)point;
-+ (UIBezierPath *)bezierPathFromPoints:(NSArray<GSGPoint *> *)points relativeToPoint:(CGPoint)point;
+- (UIBezierPath *)bezierPathRelativeToPoint:(CGPoint)point closed:(BOOL)closed;
++ (UIBezierPath *)bezierPathFromPoints:(NSArray<GSGPoint *> *)points relativeToPoint:(CGPoint)point closed:(BOOL)closed;
 
 - (BOOL)hasConnections;
 - (BOOL)isConnectedOnLeftSide;

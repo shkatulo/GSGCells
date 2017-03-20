@@ -21,8 +21,6 @@
 - (void)cellViewDidDrag:(GSGCellView *)cellView;
 - (void)cellViewDidFinishDragging:(GSGCellView *)cellView;
 
-- (void)cellViewDidTap:(GSGCellView *)cellView;
-
 @end
 
 
@@ -30,9 +28,9 @@
 @interface GSGCellView : UIView
 
 @property (nonatomic) GSGCell *cell;
-@property (nonatomic) BOOL isDraggable;
-@property (nonatomic) float dragThreshold;
 @property (nonatomic) BOOL debugLayerIsHidden;
+
+@property (nonatomic, readonly) UIPanGestureRecognizer *dragGestureRecognizer;
 
 @property (nonatomic, weak) id<GSGCellViewDelegate> delegate;
 

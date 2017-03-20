@@ -89,6 +89,19 @@
 
 
 
+- (void)actionCellTap:(UITapGestureRecognizer *)sender {
+    GSGCellView *cellView = (GSGCellView *)sender.view;
+    
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Cell tapped"
+                                                                   message:cellView.cell.name
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+    
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+
+
 - (GSGCellView *)latestCellView {
     return _cellViews.lastObject;
 }
@@ -120,6 +133,10 @@
     cellView.delegate = self;
     [self.view addSubview:cellView];
     [_cellViews addObject:cellView];
+    
+    // Add tap gesture recognizer
+    UITapGestureRecognizer *tapGR = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(actionCellTap:)];
+    [cellView addGestureRecognizer:tapGR];
     
     _shapeIndex = 0;
 }
@@ -215,17 +232,6 @@
     
     // Check connections
     [self updateConnectButtonVisibility];
-}
-
-
-
-- (void)cellViewDidTap:(GSGCellView *)cellView {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Cell tapped"
-                                                                   message:cellView.cell.name
-                                                            preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
-    
-    [self presentViewController:alert animated:YES completion:nil];
 }
 
 @end

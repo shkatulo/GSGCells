@@ -7,27 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
-
-
-
-@class GSGDebugLayer;
-
-
-
-@protocol GSGDebugLayerDelegate <NSObject>
-
-@optional
-
-- (void)debugLayer:(GSGDebugLayer *)layer shouldBeDrawnInContext:(CGContextRef)context;
-
-@end
+#import "GSGCellView.h"
 
 
 
 @interface GSGDebugLayer : CALayer
 
 @property (nonatomic) BOOL redrawAnimated;
-
-@property (nonatomic, weak) id<GSGDebugLayerDelegate> drawingDelegate;
+@property (nonatomic, weak) GSGCellView *parentCellView;
 
 @end

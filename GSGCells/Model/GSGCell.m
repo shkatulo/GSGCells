@@ -143,7 +143,7 @@ const NSUInteger kCellConnectPointRightBottomNeighbour = 5;
         return _bezierPath;
 
     // Update bezier path
-    _bezierPath = [self bezierPathRelativeToPoint:CGPointZero];
+    _bezierPath = [self bezierPathRelativeToPoint:CGPointZero closed:YES];
     
     // Update bounding box
     _boundingBox = _bezierPath.bounds;
@@ -154,16 +154,17 @@ const NSUInteger kCellConnectPointRightBottomNeighbour = 5;
 
 
 
-- (UIBezierPath *)bezierPathRelativeToPoint:(CGPoint)point {
-    return [GSGCell bezierPathFromPoints:_points relativeToPoint:point];
+- (UIBezierPath *)bezierPathRelativeToPoint:(CGPoint)point closed:(BOOL)closed {
+    return [GSGCell bezierPathFromPoints:_points relativeToPoint:point closed:closed];
 }
 
 
 
-+ (UIBezierPath *)bezierPathFromPoints:(NSArray<GSGPoint *> *)points relativeToPoint:(CGPoint)point {
++ (UIBezierPath *)bezierPathFromPoints:(NSArray<GSGPoint *> *)points relativeToPoint:(CGPoint)point closed:(BOOL)closed {
     UIBezierPath *path = [[UIBezierPath alloc] init];
     
-    for (int i = 0; i < points.count; ++i) {
+    NSInteger segmentsCount = closed ? points.count : points.count - 1;
+    for (NSInteger i = 0; i < segmentsCount; ++i) {
         GSGPoint *currPoint = points[i];
         GSGPoint *nextPoint = points[(i + 1) % points.count];
         
